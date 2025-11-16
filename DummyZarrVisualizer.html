@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Scarcity in India - Dummy Zarr Visualization</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+        }
+        
+        #container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        #header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        #map {
+            flex: 1;
+            position: relative;
+        }
+        
+        #legend {
+            position: absolute;
+            bottom: 30px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            color: #333;
+        }
+        
+        #legend h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .legend-scale {
+            display: flex;
+            height: 20px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        
+        .legend-scale div {
+            flex: 1;
+        }
+        
+        .legend-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 250px;
+            color: #333;
+        }
+        
+        #info h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #667eea;
+        }
+        
+        #info p {
+            margin: 5px 0;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            z-index: 2000;
+            background: rgba(0,0,0,0.8);
+            padding: 20px 40px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>A Demo Website to Showcase Zarr Usability</h1>
+        </div>
+        
+        <div id="map">
+            <div id="loading" class="loading">Loading Zarr data...</div>
+            <div id="info">
+                <h3>About This Data</h3>
+                <p><strong>Source:</strong> Zarr format dataset</p>
+                <p><strong>Resolution:</strong> 0.5° grid (~50km)</p>
+                <p><strong>Index:</strong> 0 (Low scarcity) to 100 (High scarcity)</p>
+                <p>Hover over the map to see values at specific locations.</p>
+            </div>
+            
+            <div id="legend">
+                <h3>Water Scarcity Index</h3>
+                <div class="legend-scale">
+                    <div style="background: #2166ac;"></div>
+                    <div style="background: #67a9cf;"></div>
+                    <div style="background: #d1e5f0;"></div>
+                    <div style="background: #fddbc7;"></div>
+                    <div style="background: #ef8a62;"></div>
+                    <div style="background: #b2182b;"></div>
+                </div>
+                <div class="legend-labels">
+                    <span>0 (Low)</span>
+                    <span>50</span>
+                    <span>100 (High)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulated Zarr data (in production, this would be loaded from the actual Zarr files)
+        function generateDummyZarrData() {
+            const latMin = 8.0, latMax = 37.0;
+            const lonMin = 68.0, lonMax = 97.0;
+            const resolution = 0.5;
+            
+            const lats = [];
+            const lons = [];
+            
+            for (let lat = latMin; lat < latMax; lat += resolution) {
+                lats.push(lat);
+            }
+            for (let lon = lonMin; lon < lonMax; lon += resolution) {
+                lons.push(lon);
+            }
+            
+            const data = [];
+            for (let i = 0; i < lats.length; i++) {
+                const row = [];
+                for (let j = 0; j < lons.length; j++) {
+                    // Generate synthetic water scarcity pattern
+                    const latNorm = (lats[i] - latMin) / (latMax - latMin);
+                    const lonNorm = (lons[j] - lonMin) / (lonMax - lonMin);
+                    
+                    // Higher scarcity in northwest (Rajasthan region)
+                    let scarcity = 70 * (1 - lonNorm) + 30 * (1 - latNorm);
+                    scarcity += Math.random() * 20 - 10;
+                    scarcity = Math.max(0, Math.min(100, scarcity));
+                    
+                    row.push(scarcity);
+                }
+                data.push(row);
+            }
+            
+            return { latitude: lats, longitude: lons, data: data };
+        }
+
+        // Initialize map
+        const map = L.map('map', {
+            center: [22.5, 82.5],
+            zoom: 5,
+            minZoom: 4,
+            maxZoom: 8
+        });
+
+        // Add base map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Color scale function
+        function getColor(value) {
+            const colors = [
+                { val: 0, color: [33, 102, 172] },    // #2166ac - dark blue
+                { val: 20, color: [103, 169, 207] },  // #67a9cf - light blue
+                { val: 40, color: [209, 229, 240] },  // #d1e5f0 - very light blue
+                { val: 60, color: [253, 219, 199] },  // #fddbc7 - light orange
+                { val: 80, color: [239, 138, 98] },   // #ef8a62 - orange
+                { val: 100, color: [178, 24, 43] }    // #b2182b - dark red
+            ];
+            
+            for (let i = 0; i < colors.length - 1; i++) {
+                if (value >= colors[i].val && value <= colors[i + 1].val) {
+                    const range = colors[i + 1].val - colors[i].val;
+                    const ratio = (value - colors[i].val) / range;
+                    
+                    const r = Math.round(colors[i].color[0] + ratio * (colors[i + 1].color[0] - colors[i].color[0]));
+                    const g = Math.round(colors[i].color[1] + ratio * (colors[i + 1].color[1] - colors[i].color[1]));
+                    const b = Math.round(colors[i].color[2] + ratio * (colors[i + 1].color[2] - colors[i].color[2]));
+                    
+                    return `rgb(${r}, ${g}, ${b})`;
+                }
+            }
+            return 'rgb(178, 24, 43)';
+        }
+
+        // Load and visualize data
+        setTimeout(() => {
+            const zarrData = generateDummyZarrData();
+            document.getElementById('loading').style.display = 'none';
+            
+            // Create rectangles for each grid cell
+            const rectangles = [];
+            for (let i = 0; i < zarrData.latitude.length; i++) {
+                for (let j = 0; j < zarrData.longitude.length; j++) {
+                    const value = zarrData.data[i][j];
+                    const bounds = [
+                        [zarrData.latitude[i], zarrData.longitude[j]],
+                        [zarrData.latitude[i] + 0.5, zarrData.longitude[j] + 0.5]
+                    ];
+                    
+                    const rect = L.rectangle(bounds, {
+                        color: getColor(value),
+                        fillColor: getColor(value),
+                        fillOpacity: 0.6,
+                        weight: 0,
+                        interactive: true
+                    });
+                    
+                    rect.bindTooltip(
+                        `<strong>Water Scarcity: ${value.toFixed(1)}</strong><br>` +
+                        `Lat: ${zarrData.latitude[i].toFixed(2)}°<br>` +
+                        `Lon: ${zarrData.longitude[j].toFixed(2)}°`,
+                        { sticky: true }
+                    );
+                    
+                    rect.addTo(map);
+                    rectangles.push(rect);
+                }
+            }
+            
+            console.log(`Rendered ${rectangles.length} grid cells from Zarr data`);
+        }, 500);
+    </script>
+</body>
+</html>
