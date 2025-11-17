@@ -1,0 +1,97 @@
+$ gdalinfo flood_probability_2023-09-25_88.19823706960149_24.314907220056885.tif
+Driver: GTiff/GeoTIFF
+Files: flood_probability_2023-09-25_88.19823706960149_24.314907220056885.tif
+       flood_probability_2023-09-25_88.19823706960149_24.314907220056885.tif.aux.xml
+Size is 30530, 21403
+Coordinate System is:
+GEOGCRS["WGS 84",
+    ENSEMBLE["World Geodetic System 1984 ensemble",
+        MEMBER["World Geodetic System 1984 (Transit)"],
+        MEMBER["World Geodetic System 1984 (G730)"],
+        MEMBER["World Geodetic System 1984 (G873)"],
+        MEMBER["World Geodetic System 1984 (G1150)"],
+        MEMBER["World Geodetic System 1984 (G1674)"],
+        MEMBER["World Geodetic System 1984 (G1762)"],
+        MEMBER["World Geodetic System 1984 (G2139)"],
+        ELLIPSOID["WGS 84",6378137,298.257223563,
+            LENGTHUNIT["metre",1]],
+        ENSEMBLEACCURACY[2.0]],
+    PRIMEM["Greenwich",0,
+        ANGLEUNIT["degree",0.0174532925199433]],
+    CS[ellipsoidal,2],
+        AXIS["geodetic latitude (Lat)",north,
+            ORDER[1],
+            ANGLEUNIT["degree",0.0174532925199433]],
+        AXIS["geodetic longitude (Lon)",east,
+            ORDER[2],
+            ANGLEUNIT["degree",0.0174532925199433]],
+    USAGE[
+        SCOPE["Horizontal component of 3D system."],
+        AREA["World."],
+        BBOX[-90,-180,90,180]],
+    ID["EPSG",4326]]
+Data axis to CRS axis mapping: 2,1
+Origin = (86.822531536265402,25.270686920623081)
+Pixel Size = (0.000089831528412,-0.000089831528412)
+Metadata:
+  AREA_OR_POINT=Area
+Image Structure Metadata:
+  INTERLEAVE=PIXEL
+Corner Coordinates:
+Upper Left  (  86.8225315,  25.2706869) ( 86d49'21.11"E, 25d16'14.47"N)
+Lower Left  (  86.8225315,  23.3480227) ( 86d49'21.11"E, 23d20'52.88"N)
+Upper Right (  89.5650881,  25.2706869) ( 89d33'54.32"E, 25d16'14.47"N)
+Lower Right (  89.5650881,  23.3480227) ( 89d33'54.32"E, 23d20'52.88"N)
+Center      (  88.1938098,  24.3093548) ( 88d11'37.72"E, 24d18'33.68"N)
+Band 1 Block=30530x1 Type=Float64, ColorInterp=Gray
+  Description = flood_label
+  Min=0.000 Max=1.000
+  NoData Value=nan
+  Overviews: 15265x10702, 7633x5351, 3817x2676, 1909x1338, 955x669, 478x335, 239x168, 120x84, 60x42
+  Metadata:
+    STATISTICS_APPROXIMATE=YES
+    STATISTICS_MAXIMUM=1
+    STATISTICS_MEAN=0.0611193183464
+    STATISTICS_MINIMUM=0
+    STATISTICS_STDDEV=0.23954904982336
+    STATISTICS_VALID_PERCENT=100
+Band 2 Block=30530x1 Type=Float64, ColorInterp=Undefined
+  Description = uncertainty
+  Min=0.000 Max=0.333
+  NoData Value=nan
+  Overviews: 15265x10702, 7633x5351, 3817x2676, 1909x1338, 955x669, 478x335, 239x168, 120x84, 60x42
+  Metadata:
+    STATISTICS_APPROXIMATE=YES
+    STATISTICS_MAXIMUM=0.33333333333333
+    STATISTICS_MEAN=0.019859184446693
+    STATISTICS_MINIMUM=0
+    STATISTICS_STDDEV=0.058523799713129
+    STATISTICS_VALID_PERCENT=100
+Band 3 Block=30530x1 Type=Float64, ColorInterp=Undefined
+  Description = flood_prob_1
+  Min=0.000 Max=1.000
+  NoData Value=nan
+  Overviews: 15265x10702, 7633x5351, 3817x2676, 1909x1338, 955x669, 478x335, 239x168, 120x84, 60x42
+  Metadata:
+    STATISTICS_APPROXIMATE=YES
+    STATISTICS_MAXIMUM=1
+    STATISTICS_MEAN=0.10656160176136
+    STATISTICS_MINIMUM=0
+    STATISTICS_STDDEV=0.29088619554382
+    STATISTICS_VALID_PERCENT=100
+Band 4 Block=30530x1 Type=Float64, ColorInterp=Undefined
+  Description = flood_prob_2
+  Min=0.000 Max=1.000
+  NoData Value=nan
+  Overviews: 15265x10702, 7633x5351, 3817x2676, 1909x1338, 955x669, 478x335, 239x168, 120x84, 60x42
+  Metadata:
+    STATISTICS_APPROXIMATE=YES
+    STATISTICS_MAXIMUM=1
+    STATISTICS_MEAN=0.075278825662254
+    STATISTICS_MINIMUM=0
+    STATISTICS_STDDEV=0.25170630724278
+    STATISTICS_VALID_PERCENT=100
+Band 5 Block=30530x1 Type=Float64, ColorInterp=Undefined
+  Description = flood_prob_3
+  NoData Value=nan
+  Overviews: 15265x10702, 7633x5351, 3817x2676, 1909x1338, 955x669, 478x335, 239x168, 120x84, 60x42
