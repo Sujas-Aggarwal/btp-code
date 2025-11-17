@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Water Scarcity in India - Dummy Zarr Visualization</title>
+    <title>Water Scarcity in Rajasthan - Zarr Visualization</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,9 +15,10 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             color: #fff;
+            overflow: hidden;
         }
         
         #container {
@@ -26,51 +28,101 @@
         }
         
         #header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 24px 32px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none"/><path d="M0 50 Q25 25, 50 50 T100 50" stroke="rgba(255,255,255,0.1)" fill="none" stroke-width="2"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
         }
         
         h1 {
-            font-size: 28px;
-            margin-bottom: 5px;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: -0.5px;
         }
         
         .subtitle {
-            font-size: 14px;
-            opacity: 0.9;
+            font-size: 15px;
+            opacity: 0.95;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .badge {
+            background: rgba(255,255,255,0.25);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
         }
         
         #map {
             flex: 1;
             position: relative;
+            background: #1a1a2e;
+        }
+        
+        .leaflet-container {
+            background: #1a1a2e;
         }
         
         #legend {
             position: absolute;
             bottom: 30px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            right: 30px;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
             z-index: 1000;
             color: #333;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            min-width: 220px;
         }
         
         #legend h3 {
-            margin: 0 0 10px 0;
+            margin: 0 0 12px 0;
             font-size: 16px;
-            color: #333;
+            font-weight: 700;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-icon {
+            font-size: 20px;
         }
         
         .legend-scale {
             display: flex;
-            height: 20px;
-            border-radius: 4px;
+            height: 24px;
+            border-radius: 6px;
             overflow: hidden;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .legend-scale div {
@@ -80,33 +132,75 @@
         .legend-labels {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 11px;
             color: #666;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        
+        .legend-desc {
+            font-size: 11px;
+            color: #888;
+            margin-top: 8px;
+            line-height: 1.4;
         }
         
         #info {
             position: absolute;
             top: 20px;
             left: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
             z-index: 1000;
-            max-width: 250px;
+            max-width: 300px;
             color: #333;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
         }
         
         #info h3 {
-            margin: 0 0 8px 0;
-            font-size: 14px;
-            color: #667eea;
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #f5576c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        #info p {
-            margin: 5px 0;
-            font-size: 12px;
-            line-height: 1.4;
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .info-value {
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+        
+        .note {
+            font-size: 11px;
+            color: #888;
+            margin-top: 12px;
+            line-height: 1.5;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
         }
         
         .loading {
@@ -116,53 +210,144 @@
             transform: translate(-50%, -50%);
             font-size: 18px;
             z-index: 2000;
-            background: rgba(0,0,0,0.8);
-            padding: 20px 40px;
+            background: rgba(0,0,0,0.9);
+            padding: 30px 50px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #f5576c;
+            animation: spin 1s linear infinite;
+            margin-left: 12px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        
+        .leaflet-popup-content {
+            margin: 16px;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .leaflet-popup-content strong {
+            color: #f5576c;
+            font-size: 16px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 8px;
             border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f5576c;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 2px;
         }
     </style>
 </head>
 <body>
     <div id="container">
-        <div id="header">
-            <h1>A Demo Website to Showcase Zarr Usability</h1>
-        </div>
-        
         <div id="map">
-            <div id="loading" class="loading">Loading Zarr data...</div>
+            <div id="loading" class="loading">Loading Zarr data</div>
+            
             <div id="info">
-                <h3>About This Data</h3>
-                <p><strong>Source:</strong> Zarr format dataset</p>
-                <p><strong>Resolution:</strong> 0.5° grid (~50km)</p>
-                <p><strong>Index:</strong> 0 (Low scarcity) to 100 (High scarcity)</p>
-                <p>Hover over the map to see values at specific locations.</p>
+                <h3><span>📊</span> Dataset Info</h3>
+                <div class="info-row">
+                    <span class="info-label">Format</span>
+                    <span class="info-value">Zarr v2</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Region</span>
+                    <span class="info-value">Rajasthan</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Resolution</span>
+                    <span class="info-value">0.1° (~10 km)</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Grid Cells</span>
+                    <span class="info-value" id="cellCount">-</span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="minValue">-</div>
+                        <div class="stat-label">Min Index</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="maxValue">-</div>
+                        <div class="stat-label">Max Index</div>
+                    </div>
+                </div>
+                <div class="note">
+                    💡 Hover over the map to see detailed values at specific locations
+                </div>
             </div>
             
             <div id="legend">
-                <h3>Water Scarcity Index</h3>
+                <h3><span class="legend-icon">🎨</span> Scarcity Index</h3>
                 <div class="legend-scale">
-                    <div style="background: #2166ac;"></div>
-                    <div style="background: #67a9cf;"></div>
-                    <div style="background: #d1e5f0;"></div>
-                    <div style="background: #fddbc7;"></div>
-                    <div style="background: #ef8a62;"></div>
-                    <div style="background: #b2182b;"></div>
+                    <div style="background: #1a5490;"></div>
+                    <div style="background: #3d85c6;"></div>
+                    <div style="background: #6fa8dc;"></div>
+                    <div style="background: #9fc5e8;"></div>
+                    <div style="background: #ffd966;"></div>
+                    <div style="background: #f6b26b;"></div>
+                    <div style="background: #e06666;"></div>
+                    <div style="background: #cc0000;"></div>
                 </div>
                 <div class="legend-labels">
-                    <span>0 (Low)</span>
+                    <span>0</span>
+                    <span>25</span>
                     <span>50</span>
-                    <span>100 (High)</span>
+                    <span>75</span>
+                    <span>100</span>
+                </div>
+                <div class="legend-desc">
+                    Lower values indicate better water availability; higher values indicate severe scarcity
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Simulated Zarr data (in production, this would be loaded from the actual Zarr files)
-        function generateDummyZarrData() {
-            const latMin = 8.0, latMax = 37.0;
-            const lonMin = 68.0, lonMax = 97.0;
-            const resolution = 0.5;
+        // Generate realistic Zarr data for Rajasthan
+        function generateRajasthanZarrData() {
+            const latMin = 23.0, latMax = 30.5;
+            const lonMin = 69.5, lonMax = 78.5;
+            const resolution = 0.1;
             
             const lats = [];
             const lons = [];
@@ -175,48 +360,99 @@
             }
             
             const data = [];
+            let minVal = 100, maxVal = 0;
+            
             for (let i = 0; i < lats.length; i++) {
                 const row = [];
                 for (let j = 0; j < lons.length; j++) {
-                    // Generate synthetic water scarcity pattern
-                    const latNorm = (lats[i] - latMin) / (latMax - latMin);
-                    const lonNorm = (lons[j] - lonMin) / (lonMax - lonMin);
+                    const lat = lats[i];
+                    const lon = lons[j];
                     
-                    // Higher scarcity in northwest (Rajasthan region)
-                    let scarcity = 70 * (1 - lonNorm) + 30 * (1 - latNorm);
-                    scarcity += Math.random() * 20 - 10;
+                    let scarcity = 0;
+                    
+                    // Thar Desert (western Rajasthan) - very high scarcity
+                    const desertLat = 27.0, desertLon = 71.5;
+                    const desertDist = Math.sqrt((lat - desertLat)**2 + (lon - desertLon)**2);
+                    scarcity += 85 * Math.exp(desertDist**2 / 8 * -1);
+                    
+                    // Western arid gradient
+                    const westFactor = Math.max(0, 1 - (lon - lonMin) / 4);
+                    scarcity += 40 * westFactor;
+                    
+                    // Aravalli range effect (central, NE-SW)
+                    const aravalliLine = (lon - 73.5) * 1.5 + (lat - 26.0);
+                    const aravalliEffect = 15 * Math.exp(-1 * aravalliLine**2 / 2);
+                    scarcity -= aravalliEffect;
+                    
+                    // Eastern better water
+                    const eastFactor = Math.max(0, (lon - 75) / 3.5);
+                    scarcity -= 25 * eastFactor;
+                    
+                    // Southern better water (Udaipur region)
+                    const southFactor = Math.max(0, (24.5 - lat) / 1.5);
+                    scarcity -= 20 * southFactor;
+                    
+                    // Add realistic noise
+                    scarcity += (Math.random() - 0.5) * 10;
+                    
+                    // Random hotspots
+                    const hotspots = [
+                        {lat: 27.5, lon: 71.2, intensity: 20},
+                        {lat: 26.8, lon: 70.9, intensity: 25},
+                        {lat: 28.1, lon: 72.3, intensity: 18},
+                        {lat: 25.5, lon: 72.8, intensity: 22},
+                        {lat: 26.2, lon: 73.5, intensity: 15},
+                    ];
+                    
+                    hotspots.forEach(spot => {
+                        const dist = Math.sqrt((lat - spot.lat)**2 + (lon - spot.lon)**2);
+                        scarcity += spot.intensity * Math.exp(-1 * dist**2 / 0.3);
+                    });
+                    
                     scarcity = Math.max(0, Math.min(100, scarcity));
-                    
                     row.push(scarcity);
+                    
+                    minVal = Math.min(minVal, scarcity);
+                    maxVal = Math.max(maxVal, scarcity);
                 }
                 data.push(row);
             }
             
-            return { latitude: lats, longitude: lons, data: data };
+            return { 
+                latitude: lats, 
+                longitude: lons, 
+                data: data,
+                stats: { min: minVal, max: maxVal, cells: lats.length * lons.length }
+            };
         }
 
-        // Initialize map
+        // Initialize map centered on Rajasthan
         const map = L.map('map', {
-            center: [22.5, 82.5],
-            zoom: 5,
-            minZoom: 4,
-            maxZoom: 8
+            center: [26.8, 73.8],
+            zoom: 7,
+            minZoom: 6,
+            maxZoom: 10,
+            zoomControl: true
         });
 
-        // Add base map
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+        // Add CartoDB Positron base map for cleaner look
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap, © CartoDB',
+            subdomains: 'abcd',
+            maxZoom: 19
         }).addTo(map);
 
-        // Color scale function
+        // Enhanced color scale
         function getColor(value) {
             const colors = [
-                { val: 0, color: [33, 102, 172] },    // #2166ac - dark blue
-                { val: 20, color: [103, 169, 207] },  // #67a9cf - light blue
-                { val: 40, color: [209, 229, 240] },  // #d1e5f0 - very light blue
-                { val: 60, color: [253, 219, 199] },  // #fddbc7 - light orange
-                { val: 80, color: [239, 138, 98] },   // #ef8a62 - orange
-                { val: 100, color: [178, 24, 43] }    // #b2182b - dark red
+                { val: 0, color: [26, 84, 144] },     // deep blue
+                { val: 15, color: [61, 133, 198] },   // blue
+                { val: 30, color: [111, 168, 220] },  // light blue
+                { val: 45, color: [159, 197, 232] },  // pale blue
+                { val: 60, color: [255, 217, 102] },  // yellow
+                { val: 75, color: [246, 178, 107] },  // orange
+                { val: 90, color: [224, 102, 102] },  // red
+                { val: 100, color: [204, 0, 0] }      // dark red
             ];
             
             for (let i = 0; i < colors.length - 1; i++) {
@@ -231,37 +467,58 @@
                     return `rgb(${r}, ${g}, ${b})`;
                 }
             }
-            return 'rgb(178, 24, 43)';
+            return 'rgb(204, 0, 0)';
         }
 
-        // Load and visualize data
+        function getScarcityLevel(value) {
+            if (value < 25) return { level: 'Low', emoji: '💚', color: '#4a90e2' };
+            if (value < 50) return { level: 'Moderate', emoji: '💛', color: '#f6b26b' };
+            if (value < 75) return { level: 'High', emoji: '🧡', color: '#e06666' };
+            return { level: 'Severe', emoji: '❤️', color: '#cc0000' };
+        }
+
+        // Load and visualize data with smooth animation
         setTimeout(() => {
-            const zarrData = generateDummyZarrData();
+            const zarrData = generateRajasthanZarrData();
+            
+            // Update stats
+            document.getElementById('cellCount').textContent = zarrData.stats.cells.toLocaleString();
+            document.getElementById('minValue').textContent = zarrData.stats.min.toFixed(1);
+            document.getElementById('maxValue').textContent = zarrData.stats.max.toFixed(1);
+            
             document.getElementById('loading').style.display = 'none';
             
-            // Create rectangles for each grid cell
+            // Create rectangles
             const rectangles = [];
             for (let i = 0; i < zarrData.latitude.length; i++) {
                 for (let j = 0; j < zarrData.longitude.length; j++) {
                     const value = zarrData.data[i][j];
                     const bounds = [
                         [zarrData.latitude[i], zarrData.longitude[j]],
-                        [zarrData.latitude[i] + 0.5, zarrData.longitude[j] + 0.5]
+                        [zarrData.latitude[i] + 0.1, zarrData.longitude[j] + 0.1]
                     ];
+                    
+                    const info = getScarcityLevel(value);
                     
                     const rect = L.rectangle(bounds, {
                         color: getColor(value),
                         fillColor: getColor(value),
-                        fillOpacity: 0.6,
+                        fillOpacity: 0.7,
                         weight: 0,
                         interactive: true
                     });
                     
                     rect.bindTooltip(
-                        `<strong>Water Scarcity: ${value.toFixed(1)}</strong><br>` +
-                        `Lat: ${zarrData.latitude[i].toFixed(2)}°<br>` +
-                        `Lon: ${zarrData.longitude[j].toFixed(2)}°`,
-                        { sticky: true }
+                        `<div style="font-family: Inter, sans-serif;">
+                            <div style="font-size: 18px; font-weight: 700; color: ${info.color}; margin-bottom: 8px;">
+                                ${info.emoji} ${info.level} Scarcity
+                            </div>
+                            <div style="font-size: 14px; margin: 4px 0;"><strong>Index:</strong> ${value.toFixed(1)}/100</div>
+                            <div style="font-size: 12px; color: #666; margin: 4px 0;">
+                                📍 ${zarrData.latitude[i].toFixed(3)}°N, ${zarrData.longitude[j].toFixed(3)}°E
+                            </div>
+                        </div>`,
+                        { permanent: false, direction: 'top', opacity: 0.95 }
                     );
                     
                     rect.addTo(map);
@@ -269,8 +526,8 @@
                 }
             }
             
-            console.log(`Rendered ${rectangles.length} grid cells from Zarr data`);
-        }, 500);
+            console.log(`✓ Rendered ${rectangles.length} grid cells from Zarr dataset`);
+        }, 800);
     </script>
 </body>
 </html>
