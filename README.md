@@ -1,6 +1,6 @@
 # Scalable Cloud-Optimised Geospatial Dashboard
 
-**B.Tech Project**  
+**[B.Tech Project](https://github.com/Sujas-Aggarwal/btp-code)**  
 Department of Civil Engineering, IIT Delhi  
 November 2025  
 By Sujas Kumar
